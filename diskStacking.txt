@@ -1,0 +1,71 @@
+You are given a non-empty array of arrays. Each subarray holds three integers and represents a disk. These integers denote each disk's width, depth, and height,
+respectively. Your goal is to stack up the disks and to maximize the total height of the stack. A disk must have a strictly smaller width, depth, and height than any
+other disk below it. Write a function that returns an array of the disks in the final stack, starting with the top disk and ending with the bottom disk. Note that you
+cannot rotate disks; in other words, the integers in each subarray must represent [width, depth, height] at all times. Assume that there will only be one stack with
+the greatest total height.
+Sample input: [ [1, 3, 1], [2, 1, 2], [3, 2, 3], [2, 3, 4], [4, 4, 5], [2, 2, 8]]
+Sample output: [[2, 1, 2], [3, 2, 3], [4, 4, 5]]
+maxHeight =    [ 1               2         5         4         10           8   ]
+              [    null         null      1          null     2         null] 
+function diskStacking(disks){
+  disks.sort((a,b) => a[2] - b[2])
+  let maxHeight = disks.map((arr) => arr[2])
+  let seq = disks.map((arr) => null)
+  
+  for(let i = 1; i < disks.length; i++){
+    for(let j = 0; j < i; j++){
+      let currDisk = disks[i]
+      let prevDisk = disks[j]
+      if(isValidDisks(prevDisk,currDisk)){
+        if(maxHeight[j] + currDisk[2] > maxHeight[i]){
+          seq[i] = j
+          maxHeight[i] = maxHeight[j] + currDisk[2]
+        }
+      }
+    }
+  }
+  
+  let maxHeightIdx = maxHeight.indexOf(Math.max(...maxHeight))
+  let maxStackDisks = getMaxStackDisks(maxHeightIdx, disks,seq)
+  
+  return maxStackDisks
+}
+
+
+function isValidDisks(prevDisk, currDisk){
+  return prevDisk[0] <  currDisk[0] && prevDisk[1] <  currDisk[1] && prevDisk[2] <  currDisk[2]
+}
+function getMaxStackDisks(idx, disks,seq){
+  let result = []
+  while(idx !== null){
+    result.unshift(disks[idx].concat())
+    idx = seq[idx]
+  }
+  return result
+}
+
+
+
+Time -> O(N^2)
+Space -> O(N)
+main(disks)
+  disks.sort((a, b) => a[2] - b[2])
+  let maxHeight = disks.map((arr) => arr[2])
+  let seq = disks.map((arr) => null)
+  
+  for(let i = 1; i < disks.length; i++){
+    let currDisk = disks[i]
+    for(let j = 0; j < i; j++){
+      let prevDisk = disks[j]
+      if(isVaildDisk(currDisk,prevDisk)){ // Helper Method
+          if(maxHeight[j] + currDisk[2] > maxHeight[i]){
+            seq[i] = j
+            maxHeight[i] = maxHeight[j] + currDisk[2]
+          }
+      }
+    }
+  }
+  
+  let maxHeightIdx = maxHeight.indexOf(Math.max(...maxHeight))
+  let maxStackDisks = getMaxStackDisks(maxHeight, disks) // Helper
+  return maxStackDisks
